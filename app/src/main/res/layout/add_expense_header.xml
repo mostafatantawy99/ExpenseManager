@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical"
+    android:id="@+id/mainDisplay"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/colorPrimary"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/txtExpenseTotal"
+        android:inputType="numberDecimal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:text="0"
+        android:fontFamily="sans-serif-light"
+        android:textSize="@dimen/calculator_display"
+        android:textColor="@color/white"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/ic_expand_more_white_24dp"
+        android:drawableRight="@drawable/ic_expand_more_white_24dp"
+        style="?android:borderlessButtonStyle"/>
+
+    <LinearLayout
+        android:id="@+id/add_expense_numpad"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimaryDark"/>
+
+        <include layout="@layout/numpad" />
+
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:textAllCaps="true"
+            style="?android:borderlessButtonStyle"
+            android:textColor="@color/colorAccent"
+            android:textSize="18sp"
+            android:gravity="right"
+            android:text="Okay" />
+    </LinearLayout>
+</LinearLayout>
