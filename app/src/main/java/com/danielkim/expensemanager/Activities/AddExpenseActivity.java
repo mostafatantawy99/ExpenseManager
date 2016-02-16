@@ -3,6 +3,7 @@ package com.danielkim.expensemanager.Activities;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -10,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.DatePicker;
@@ -22,6 +25,7 @@ import android.widget.TextView;
 import com.danielkim.expensemanager.DBHelper;
 import com.danielkim.expensemanager.R;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -77,9 +81,13 @@ public class AddExpenseActivity extends AppCompatActivity
         btnBackspace.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (strExpenseTotal != "") {
+                if (strExpenseTotal.length() > 0) {
                     strExpenseTotal = strExpenseTotal.substring(0, strExpenseTotal.length() - 1);
-                    txtExpenseInput.setText(strExpenseTotal);
+                    if (strExpenseTotal.length() == 0){
+                        txtExpenseInput.setText("0");
+                    } else {
+                        txtExpenseInput.setText(strExpenseTotal);
+                    }
                 }
             }
         });
@@ -127,12 +135,28 @@ public class AddExpenseActivity extends AppCompatActivity
                 chooseDate();
             }
         });
+
+        // populate spinners with database data
+        populateSpinners();
     }
 
     public void onNumPadButtonClick(View v){
-        Button btn = (Button)findViewById(v.getId());
-        strExpenseTotal += btn.getText();
+        int integerPlaces = strExpenseTotal.indexOf('.');
+        if (integerPlaces != -1){
+            int decimalPlaces = strExpenseTotal.length() - integerPlaces - 1;
+            if (decimalPlaces >= 2){
+                // do not accept more input if there are already 2 decimal places
+                return ;
+            }
+        }
 
+        Button btn = (Button)findViewById(v.getId());
+        if (strExpenseTotal.length() == 0 && btn.getText() == "."){
+            // first button press is a decimal. append a 0 in front.
+            strExpenseTotal = "0";
+        }
+
+        strExpenseTotal += btn.getText();
         txtExpenseInput.setText(strExpenseTotal);
     }
 
@@ -144,6 +168,10 @@ public class AddExpenseActivity extends AppCompatActivity
 
     // Open CalendarView to choose date
     public void chooseDate(){
+        // close soft keyboard
+        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        mgr.hideSoftInputFromWindow(getWindow().getCurrentFocus().getWindowToken(), 0);
+
         DatePickerDialog datePicker = new DatePickerDialog(this, this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePicker.show();
     }
@@ -151,5 +179,27 @@ public class AddExpenseActivity extends AppCompatActivity
     // User clicks doneFab button to add expense
     public void confirmAddExpense(View v){
 
+    }
+
+    // Populate spinners with the categories and payment methods
+    public void populateSpinners(){
+        Cursor categoriesCursor = db.getCategories();
+        Cursor pmCursor = db.getPaymentMethods();
+
+        ArrayList<String> categories = new ArrayList<String>();
+        ArrayList<String> paymentMethods = new ArrayList<String>();
+
+        for (categoriesCursor.moveToFirst(); !categoriesCursor.isAfterLast(); categoriesCursor.moveToNext()){
+            categories.add(categoriesCursor.getString(categoriesCursor.getColumnIndex(DBHelper.CategoriesTable.COL_CATEGORY)));
+        }
+        for (pmCursor.moveToFirst(); !pmCursor.isAfterLast(); pmCursor.moveToNext()){
+            paymentMethods.add(pmCursor.getString(pmCursor.getColumnIndex(DBHelper.PaymentMethodsTable.COL_PAYMENT_METHOD)));
+        }
+
+        ArrayAdapter<String> adapterCategories = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, categories);
+        spinnerCategory.setAdapter(adapterCategories);
+
+        ArrayAdapter<String> adapterPaymentMethods = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, paymentMethods);
+        spinnerPaymentMethod.setAdapter(adapterPaymentMethods);
     }
 }

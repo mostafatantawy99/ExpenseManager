@@ -15,6 +15,7 @@
         android:id="@+id/txt_expense_total"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
         android:gravity="right"
         android:text="0"
         android:fontFamily="sans-serif-light"
