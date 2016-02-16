@@ -13,5 +13,5 @@
 
     <!-- Calculator -->
     <dimen name="calculator_display">100sp</dimen>
-    <dimen name="numpad_buttons">50sp</dimen>
+    <dimen name="numpad_buttons">40sp</dimen>
 </resources>

@@ -14,25 +14,42 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "expenses.db";
     private static final int DATABASE_VERSION = 1;
 
-    //Databases for tracking expenses
+    //Database for tracking expenses
     public static abstract class DBHelperItem implements BaseColumns {
-        public static final String TABLE_NAME = "expenses";
+        public static final String TABLE_EXPENSES_NAME = "expenses";
         public static final String COL_DATE = "date";
         public static final String COL_AMOUNT = "amount";
         public static final String COL_CATEGORY = "category";
         public static final String COL_PAYMENT_METHOD = "payment_method";
         public static final String COL_NOTES = "notes";
+
+        public static final String TABLE_CATEGORIES_NAME = "categories";
+        public static final String COL_COLOUR = "colour";
+
+        public static final String TABLE_PAYMENT_METHODS_NAME = "payment_methods";
+        public static final String COL_ICON = "icon";
     }
 
     public static final String COMMA_SEP = ",";
     public static final String SQL_CREATE_EXPENSES_TB =
-            "CREATE TABLE " + DBHelperItem.TABLE_NAME + " (" +
+            "CREATE TABLE " + DBHelperItem.TABLE_EXPENSES_NAME + " (" +
                     DBHelperItem._ID + " INTEGER PRIMARY KEY " + COMMA_SEP +
                     DBHelperItem.COL_DATE + " TEXT " + COMMA_SEP +
                     DBHelperItem.COL_AMOUNT + " DOUBLE " + COMMA_SEP +
                     DBHelperItem.COL_CATEGORY + " TEXT " + COMMA_SEP +
                     DBHelperItem.COL_PAYMENT_METHOD + " TEXT " + COMMA_SEP +
                     DBHelperItem.COL_NOTES + " TEXT " + ")";
+
+    public static final String SQL_CREATE_CATEGORIES_TB =
+            "CREATE TABLE " + DBHelperItem.TABLE_CATEGORIES_NAME + " (" +
+                    DBHelperItem._ID + " INTEGER PRIMARY KEY " + COMMA_SEP +
+                    DBHelperItem.COL_CATEGORY + " TEXT " + COMMA_SEP;
+
+    public static final String SQL_CREATE_PAYMENT_METHODS_TB =
+            "CREATE TABLE " + DBHelperItem.TABLE_PAYMENT_METHODS_NAME + " (" +
+                    DBHelperItem._ID + " INTEGER PRIMARY KEY " + COMMA_SEP +
+                    DBHelperItem.COL_PAYMENT_METHOD + " TEXT " + COMMA_SEP;
+
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -41,11 +58,39 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_EXPENSES_TB);
+        db.execSQL(SQL_CREATE_CATEGORIES_TB);
+        db.execSQL(SQL_CREATE_PAYMENT_METHODS_TB);
+    }
+
+    public void onCreateCategoriesTable(){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(DBHelperItem.COL_CATEGORY, "Food");
+        cv.put(DBHelperItem.COL_CATEGORY, "Leisure");
+        cv.put(DBHelperItem.COL_CATEGORY, "School");
+        cv.put(DBHelperItem.COL_CATEGORY, "Groceries");
+        cv.put(DBHelperItem.COL_CATEGORY, "Transport");
+        cv.put(DBHelperItem.COL_CATEGORY, "Utilities");
+        cv.put(DBHelperItem.COL_CATEGORY, "Other");
+
+        db.insert(DBHelperItem.TABLE_CATEGORIES_NAME, null, cv);
+    }
+
+    public void onCreatePaymentMethodsTable(){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(DBHelperItem.COL_PAYMENT_METHOD, "Debit");
+        cv.put(DBHelperItem.COL_PAYMENT_METHOD, "Credit");
+        cv.put(DBHelperItem.COL_PAYMENT_METHOD, "Cash");
+
+        db.insert(DBHelperItem.TABLE_PAYMENT_METHODS_NAME, null, cv);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + DBHelperItem.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DBHelperItem.TABLE_EXPENSES_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DBHelperItem.TABLE_PAYMENT_METHODS_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DBHelperItem.TABLE_CATEGORIES_NAME);
         onCreate(db);
     }
 
@@ -59,7 +104,7 @@ public class DBHelper extends SQLiteOpenHelper {
         cv.put(DBHelperItem.COL_PAYMENT_METHOD, method);
         cv.put(DBHelperItem.COL_NOTES, notes);
 
-        long rowId = db.insert(DBHelperItem.TABLE_NAME, null, cv);
+        long rowId = db.insert(DBHelperItem.TABLE_EXPENSES_NAME, null, cv);
         return rowId;
     }
 
@@ -68,7 +113,7 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
 
         Cursor c = db.rawQuery("SELECT * FROM " +
-                DBHelperItem.TABLE_NAME + " ORDER BY " +
+                DBHelperItem.TABLE_EXPENSES_NAME + " ORDER BY " +
                 DBHelperItem.COL_DATE + " DESC", null);
 
         return c;
