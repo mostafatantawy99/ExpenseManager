@@ -2,19 +2,19 @@ package com.danielkim.expensemanager.Activities;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -22,8 +22,10 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.danielkim.expensemanager.CustomAnimation;
 import com.danielkim.expensemanager.DBHelper;
 import com.danielkim.expensemanager.R;
+import com.danielkim.expensemanager.Utilities;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,7 +41,6 @@ public class AddExpenseActivity extends AppCompatActivity
 
     // add_expense_header
     private TextView txtExpenseInput = null; // User inputs the expense amount
-    private TextView txtExpandNumPad = null; // Expand arrow icon. Visible while numpad is hidden
     private LinearLayout layoutNumPad = null; // Layout of the numpad
     private Button btnCancel = null; // exit activity without adding expense
 
@@ -50,11 +51,9 @@ public class AddExpenseActivity extends AppCompatActivity
     private EditText txtDate = null; // Expense date. Defaults to current date. Clicking opens CalendarView
 
     //numpad
-    private Button btnExpenseInputOkay = null; // Button to indicate that expense amount was inputted. Hides the numpad.
+    private Button btnExpandNumPad = null;
     private ImageButton btnBackspace = null;
-
     private String strExpenseTotal = ""; //stores string of user inputted expense
-    private String date; //date of expense
     private Calendar calendar;
 
     public AddExpenseActivity() {
@@ -69,10 +68,10 @@ public class AddExpenseActivity extends AppCompatActivity
 
         fabDone = (FloatingActionButton)findViewById(R.id.fab_done);
         txtExpenseInput = (TextView)findViewById(R.id.txt_expense_total);
-        txtExpandNumPad = (TextView)findViewById(R.id.expand_numpad);
+        //btnExpandNumPad = (TextView)findViewById(R.id.expand_numpad);
         btnCancel = (Button)findViewById(R.id.btn_cancel);
         layoutNumPad = (LinearLayout)findViewById(R.id.add_expense_numpad);
-        btnExpenseInputOkay = (Button)findViewById(R.id.btn_okay);
+        btnExpandNumPad = (Button)findViewById(R.id.btn_okay);
         spinnerCategory = (Spinner)findViewById(R.id.spinner_category);
         spinnerPaymentMethod = (Spinner)findViewById(R.id.spinner_payment_method);
         txtNotes = (EditText)findViewById(R.id.add_expense_note);
@@ -96,28 +95,21 @@ public class AddExpenseActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 if (layoutNumPad.getVisibility() == View.GONE){
-                    layoutNumPad.setVisibility(View.VISIBLE);
-                    txtExpandNumPad.setVisibility(View.GONE);
+                    onNumPadExpand();
                 } else {
-                    layoutNumPad.setVisibility(View.GONE);
-                    txtExpandNumPad.setVisibility(View.VISIBLE);
+                    onNumPadCollapse();
                 }
             }
         });
 
-        txtExpandNumPad.setOnClickListener(new View.OnClickListener(){
+        btnExpandNumPad.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                layoutNumPad.setVisibility(View.VISIBLE);
-                txtExpandNumPad.setVisibility(View.GONE);
-            }
-        });
-
-        btnExpenseInputOkay.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                layoutNumPad.setVisibility(View.GONE);
-                txtExpandNumPad.setVisibility(View.VISIBLE);
+                if (layoutNumPad.getVisibility() == View.GONE){
+                    onNumPadExpand();
+                } else {
+                    onNumPadCollapse();
+                }
             }
         });
 
@@ -136,8 +128,37 @@ public class AddExpenseActivity extends AppCompatActivity
             }
         });
 
+        txtNotes.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus){
+                    Utilities.hideKeyboard((Activity)getApplicationContext());
+                }
+            }
+        });
+
+        fabDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmAddExpense();
+            }
+        });
+
         // populate spinners with database data
         populateSpinners();
+    }
+
+    public void onNumPadExpand(){
+        CustomAnimation.expand(findViewById(R.id.add_expense_numpad));
+        btnExpandNumPad.setText(R.string.okay);
+        btnExpandNumPad.setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
+    }
+
+    public void onNumPadCollapse(){
+        CustomAnimation.collapse(findViewById(R.id.add_expense_numpad));
+        Drawable img = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_expand_more_white_24dp);
+        btnExpandNumPad.setText("");
+        btnExpandNumPad.setCompoundDrawablesWithIntrinsicBounds(null, null, img, null);
     }
 
     public void onNumPadButtonClick(View v){
@@ -151,9 +172,15 @@ public class AddExpenseActivity extends AppCompatActivity
         }
 
         Button btn = (Button)findViewById(v.getId());
-        if (strExpenseTotal.length() == 0 && btn.getText() == "."){
-            // first button press is a decimal. append a 0 in front.
-            strExpenseTotal = "0";
+        if (strExpenseTotal.length() == 0){
+            if (btn.getId() == R.id.btnDot){
+                // first button press is a decimal. append a 0 in front.
+                strExpenseTotal = "0";
+            } else if (btn.getId() == R.id.btn0){
+                // first button press is a 0. Don't update display or update strExpenseTotal
+                // (leading 0 does not change value)
+                return;
+            }
         }
 
         strExpenseTotal += btn.getText();
@@ -164,21 +191,37 @@ public class AddExpenseActivity extends AppCompatActivity
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         String date = (monthOfYear + 1) + " / " + dayOfMonth + " / " + year;
         txtDate.setText(date);
+
+        // update calendar
+        calendar.set(year, monthOfYear, dayOfMonth);
     }
 
     // Open CalendarView to choose date
     public void chooseDate(){
-        // close soft keyboard
-        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        mgr.hideSoftInputFromWindow(getWindow().getCurrentFocus().getWindowToken(), 0);
+        Utilities.hideKeyboard(this);
 
         DatePickerDialog datePicker = new DatePickerDialog(this, this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePicker.show();
     }
 
     // User clicks doneFab button to add expense
-    public void confirmAddExpense(View v){
+    public void confirmAddExpense(){
+        double amount = Double.parseDouble(txtExpenseInput.getText().toString());
+        if (amount == 0){
+            // expense cannot be 0.
+            // Open snackbar to notify user
+            Snackbar.make(findViewById(R.id.fab_done), getString(R.string.snackbar_input_amount), Snackbar.LENGTH_SHORT)
+                    .show();
+            return;
+        }
 
+        String notes = txtNotes.getText().toString();
+        String category = spinnerCategory.getSelectedItem().toString();
+        String paymentMethod = spinnerPaymentMethod.getSelectedItem().toString();
+        // Store date as time since epoch
+        long date = calendar.getTimeInMillis() / 1000L;
+        db.insertNewExpense(date, amount, category, paymentMethod, notes);
+        onBackPressed(); // close activity
     }
 
     // Populate spinners with the categories and payment methods
@@ -186,8 +229,8 @@ public class AddExpenseActivity extends AppCompatActivity
         Cursor categoriesCursor = db.getCategories();
         Cursor pmCursor = db.getPaymentMethods();
 
-        ArrayList<String> categories = new ArrayList<String>();
-        ArrayList<String> paymentMethods = new ArrayList<String>();
+        ArrayList<String> categories = new ArrayList<>();
+        ArrayList<String> paymentMethods = new ArrayList<>();
 
         for (categoriesCursor.moveToFirst(); !categoriesCursor.isAfterLast(); categoriesCursor.moveToNext()){
             categories.add(categoriesCursor.getString(categoriesCursor.getColumnIndex(DBHelper.CategoriesTable.COL_CATEGORY)));
@@ -196,10 +239,10 @@ public class AddExpenseActivity extends AppCompatActivity
             paymentMethods.add(pmCursor.getString(pmCursor.getColumnIndex(DBHelper.PaymentMethodsTable.COL_PAYMENT_METHOD)));
         }
 
-        ArrayAdapter<String> adapterCategories = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, categories);
+        ArrayAdapter<String> adapterCategories = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, categories);
         spinnerCategory.setAdapter(adapterCategories);
 
-        ArrayAdapter<String> adapterPaymentMethods = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, paymentMethods);
+        ArrayAdapter<String> adapterPaymentMethods = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, paymentMethods);
         spinnerPaymentMethod.setAdapter(adapterPaymentMethods);
     }
 }

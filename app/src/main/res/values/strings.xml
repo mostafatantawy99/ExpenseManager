@@ -10,6 +10,7 @@
     <string name="currency">$</string>
 
     <!-- Add Expense Fragment-->
+    <string name="snackbar_input_amount">Please specify the expense amount</string>
     <string name="default_date">Today</string>
     <string name="add_expense_note">Note</string>
     <string name="add_expense_date">Date</string>

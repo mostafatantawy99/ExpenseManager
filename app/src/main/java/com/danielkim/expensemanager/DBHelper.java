@@ -23,8 +23,8 @@ public class DBHelper extends SQLiteOpenHelper {
         public static final String TABLE_EXPENSES_NAME = "expenses";
         public static final String COL_DATE = "date";
         public static final String COL_AMOUNT = "amount";
-        public static final String COL_CATEGORY_ID = "category";
-        public static final String COL_PAYMENT_METHOD_ID = "payment_method";
+        public static final String COL_CATEGORY = "category";
+        public static final String COL_PAYMENT_METHOD = "payment_method";
         public static final String COL_NOTES = "notes";
     }
 
@@ -45,10 +45,10 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String SQL_CREATE_EXPENSES_TB =
             "CREATE TABLE " + ExpensesTable.TABLE_EXPENSES_NAME + " (" +
                     ExpensesTable._ID + " INTEGER PRIMARY KEY " + COMMA_SEP +
-                    ExpensesTable.COL_DATE + " TEXT " + COMMA_SEP +
+                    ExpensesTable.COL_DATE + " INTEGER " + COMMA_SEP +
                     ExpensesTable.COL_AMOUNT + " DOUBLE " + COMMA_SEP +
-                    ExpensesTable.COL_CATEGORY_ID + " INTEGER " + COMMA_SEP +
-                    ExpensesTable.COL_PAYMENT_METHOD_ID + " INTEGER " + COMMA_SEP +
+                    ExpensesTable.COL_CATEGORY + " TEXT " + COMMA_SEP +
+                    ExpensesTable.COL_PAYMENT_METHOD + " TEXT " + COMMA_SEP +
                     ExpensesTable.COL_NOTES + " TEXT " + ")";
 
     public static final String SQL_CREATE_CATEGORIES_TB =
@@ -109,13 +109,13 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     //insert new transaction into the Expenses table
-    public long insertNewExpense(String date, double amt, int categoryId, int paymentMethodId, String notes){
+    public long insertNewExpense(long date, double amt, String category, String paymentMethod, String notes){
         SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(ExpensesTable.COL_DATE, date);
         cv.put(ExpensesTable.COL_AMOUNT, amt);
-        cv.put(ExpensesTable.COL_CATEGORY_ID, categoryId);
-        cv.put(ExpensesTable.COL_PAYMENT_METHOD_ID, paymentMethodId);
+        cv.put(ExpensesTable.COL_CATEGORY, category);
+        cv.put(ExpensesTable.COL_PAYMENT_METHOD, paymentMethod);
         cv.put(ExpensesTable.COL_NOTES, notes);
 
         long rowId = db.insert(ExpensesTable.TABLE_EXPENSES_NAME, null, cv);
