@@ -15,14 +15,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.danielkim.expensemanager.DBHelper;
+import com.danielkim.expensemanager.Databases.DBHelper;
+import com.danielkim.expensemanager.Fragments.HistoryFragment;
+import com.danielkim.expensemanager.Fragments.OverviewFragment;
 import com.danielkim.expensemanager.R;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     DBHelper database;
-    FloatingActionButton fabAddExpense; // add new expense fab button
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,18 +42,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         database = new DBHelper(this);
-        fabAddExpense = (FloatingActionButton)findViewById(R.id.fab);
-        fabAddExpense.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                addNewExpense();
-            }
-        });
-    }
 
-    public void addNewExpense(){
-        Intent intent = new Intent(this, AddExpenseActivity.class);
-        startActivity(intent);
+        displayView(R.id.nav_overview);
     }
 
     @Override
@@ -91,24 +82,42 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
+        displayView(item.getItemId());
+        return true;
+    }
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+    public void displayView(int viewId){
+        Fragment fragment = null;
+        String title = getString(R.string.app_name);
+        switch (viewId) {
+            case R.id.nav_overview:
+                fragment = new OverviewFragment();
+                title  = "Overview";
+                break;
+            case R.id.nav_history:
+                fragment = new HistoryFragment();
+                title = "History";
+                break;
+            case R.id.nav_charts:
+            case R.id.nav_export:
+            case R.id.nav_share:
+            case R.id.nav_send:
+                break;
+        }
 
-        } else if (id == R.id.nav_slideshow) {
+        if (fragment != null) {
+            getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, fragment)
+                .commit();
+        }
 
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        // set the toolbar title
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(title);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 }

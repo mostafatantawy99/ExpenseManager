@@ -24,6 +24,8 @@
             android:windowSoftInputMode="stateHidden"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <provider android:name=".Databases.DBContentProvider"
+                  android:authorities="com.danielkim.expensemanager.Databases.DBContentProvider" />
     </application>
 
 </manifest>

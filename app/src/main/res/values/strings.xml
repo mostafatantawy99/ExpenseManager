@@ -6,6 +6,12 @@
 
     <string name="action_settings">Settings</string>
 
+    <!-- Nav -->
+    <string name="nav_overview">Overview</string>
+    <string name="nav_history">History</string>
+    <string name="nav_charts">Charts</string>
+    <string name="nav_export">Export</string>
+
     <!-- Main Summary Page -->
     <string name="currency">$</string>
 

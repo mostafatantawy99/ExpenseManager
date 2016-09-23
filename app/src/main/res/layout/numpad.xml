@@ -20,7 +20,6 @@
                 android:fontFamily="sans-serif-light"
                 style="?android:attr/borderlessButtonStyle"
                 android:onClick="onNumPadButtonClick"
-                android:background="@android:color/transparent"
                 />
             <Button
                 android:id="@+id/btn8"
@@ -31,7 +30,6 @@
                 android:fontFamily="sans-serif-light"
                 style="?android:attr/borderlessButtonStyle"
                 android:onClick="onNumPadButtonClick"
-                android:background="@android:color/transparent"
                 />
             <Button
                 android:id="@+id/btn7"
@@ -42,7 +40,6 @@
                 android:fontFamily="sans-serif-light"
                 style="?android:attr/borderlessButtonStyle"
                 android:onClick="onNumPadButtonClick"
-                android:background="@android:color/transparent"
                 />
         </TableRow>
 
@@ -57,7 +54,6 @@
                 android:fontFamily="sans-serif-light"
                 style="?android:attr/borderlessButtonStyle"
                 android:onClick="onNumPadButtonClick"
-                android:background="@android:color/transparent"
                 />
             <Button
                 android:id="@+id/btn5"
@@ -68,7 +64,6 @@
                 android:fontFamily="sans-serif-light"
                 style="?android:attr/borderlessButtonStyle"
                 android:onClick="onNumPadButtonClick"
-                android:background="@android:color/transparent"
                 />
             <Button
                 android:id="@+id/btn4"
@@ -79,7 +74,6 @@
                 android:fontFamily="sans-serif-light"
                 style="?android:attr/borderlessButtonStyle"
                 android:onClick="onNumPadButtonClick"
-                android:background="@android:color/transparent"
                 />
         </TableRow>
 
@@ -94,7 +88,6 @@
                 android:fontFamily="sans-serif-light"
                 style="?android:attr/borderlessButtonStyle"
                 android:onClick="onNumPadButtonClick"
-                android:background="@android:color/transparent"
                 />
             <Button
                 android:id="@+id/btn2"
@@ -105,7 +98,6 @@
                 android:fontFamily="sans-serif-light"
                 style="?android:attr/borderlessButtonStyle"
                 android:onClick="onNumPadButtonClick"
-                android:background="@android:color/transparent"
                 />
             <Button
                 android:id="@+id/btn1"
@@ -116,7 +108,6 @@
                 android:fontFamily="sans-serif-light"
                 style="?android:attr/borderlessButtonStyle"
                 android:onClick="onNumPadButtonClick"
-                android:background="@android:color/transparent"
                 />
         </TableRow>
 
@@ -131,7 +122,6 @@
                 android:fontFamily="sans-serif-light"
                 style="?android:attr/borderlessButtonStyle"
                 android:onClick="onNumPadButtonClick"
-                android:background="@android:color/transparent"
                 />
             <Button
                 android:id="@+id/btn0"
@@ -142,17 +132,16 @@
                 android:fontFamily="sans-serif-light"
                 style="?android:attr/borderlessButtonStyle"
                 android:onClick="onNumPadButtonClick"
-                android:background="@android:color/transparent"
                 />
             <ImageButton
                 android:id="@+id/btnBackspace"
                 android:layout_weight="1"
+                android:layout_height="match_parent"
                 android:textColor="@color/white"
                 android:src="@drawable/ic_keyboard_backspace_white_24dp"
                 android:scaleType="fitCenter"
-                android:padding="6sp"
+                android:padding="14sp"
                 style="?android:attr/borderlessButtonStyle"
-                android:background="@android:color/transparent"
                 />
         </TableRow>
     </TableLayout>
