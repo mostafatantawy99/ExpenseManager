@@ -21,13 +21,15 @@ public class DBContentProvider extends ContentProvider {
     private static final int EXPENSES_CATEGORY = 5;
     private static final int EXPENSES_PAYMENT_METHOD = 6;
     private static final int EXPENSES_NOTES = 7;
-
-    private static final int EXPENSES_TOTAL_CURR_MONTH = 8;
+    private static final int EXPENSES_FILTER = 8;
 
     private static final String AUTHORITY = "com.danielkim.expensemanager.Databases.DBContentProvider";
     private static final String BASE_PATH = "expenses";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
             + "/" + BASE_PATH);
+
+    public static final Uri CONTENT_URI_FILTER = Uri.parse("content://" + AUTHORITY
+            + "/" + BASE_PATH + "/filter");
 
     private static final UriMatcher sURIMatcher = new UriMatcher(
             UriMatcher.NO_MATCH);
@@ -39,6 +41,7 @@ public class DBContentProvider extends ContentProvider {
         sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#/category_id", EXPENSES_CATEGORY);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#/payment_method_id", EXPENSES_PAYMENT_METHOD);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#/notes", EXPENSES_NOTES);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/filter", EXPENSES_FILTER);
     }
 
     @Override
@@ -54,6 +57,8 @@ public class DBContentProvider extends ContentProvider {
 
         String joins = " t1 INNER JOIN " + DBHelper.CategoriesTable.TABLE_CATEGORIES_NAME +
                 " t2 ON t2._id = t1." + DBHelper.ExpensesTable.COL_CATEGORY_ID;
+
+        String groupBy = null;
 
         int uriType = sURIMatcher.match(uri);
         switch (uriType) {
@@ -90,13 +95,17 @@ public class DBContentProvider extends ContentProvider {
                 queryBuilder.appendWhere(DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID + "="
                         + uri.getLastPathSegment());
                 break;
+            case EXPENSES_FILTER:
+                groupBy = "strftime('%Y-%m'," + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch')";
+                queryBuilder.setTables(DBHelper.ExpensesTable.TABLE_EXPENSES_NAME);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
 
         SQLiteDatabase db = mDatabase.getWritableDatabase();
         Cursor cursor = queryBuilder.query(db, projection, selection,
-                selectionArgs, null, null, sortOrder);
+                selectionArgs, groupBy, null, sortOrder, null);
         // make sure that potential listeners are getting notified
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
 

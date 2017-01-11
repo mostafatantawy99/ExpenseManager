@@ -3,42 +3,73 @@ package com.danielkim.expensemanager.Adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.*;
 
-import com.danielkim.expensemanager.ExpenseItem;
+import com.danielkim.expensemanager.Models.ExpenseItem;
 import com.danielkim.expensemanager.R;
 
-import java.sql.Date;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 /**
  * Created by Daniel on 2/20/2016.
  */
 
-public class HistoryAdapter extends CursorAdapter {
-    ExpenseItem item;
-    static Context mContext;
-    LayoutInflater layoutInflater;
+public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.ViewHolder>{
+    private static Context mContext;
+    private LayoutInflater layoutInflater;
 
-    private TextView categoryTxt;
-    private TextView amountTxt;
-    private TextView dateTxt;
-    private TextView paymentMethodTxt;
-    private ImageView circle;
-
-    public HistoryAdapter(Context context, Cursor c, int flags) {
-        super(context, c, 0);
+    public HistoryAdapter(Context context, Cursor c) {
+        super(context, c);
         mContext = context;
         layoutInflater = LayoutInflater.from(context);
     }
 
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView categoryTxt;
+        TextView amountTxt;
+        TextView dateTxt;
+        TextView paymentMethodTxt;
+        ImageView circle;
+        ViewHolder(View view) {
+            super(view);
+            categoryTxt = (TextView)view.findViewById(R.id.txt_hist_category);
+            amountTxt = (TextView)view.findViewById(R.id.txt_hist_amount);
+            dateTxt = (TextView)view.findViewById(R.id.txt_hist_date);
+            paymentMethodTxt = (TextView)view.findViewById(R.id.txt_hist_payment_method);
+            circle = (ImageView)view.findViewById(R.id.circle_hist);
+        }
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemView = layoutInflater
+                .inflate(R.layout.li_history_item, parent, false);
+        return new ViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor) {
+        ExpenseItem item = ExpenseItem.fromCursor(cursor);
+        String note = item.getNote();
+        viewHolder.categoryTxt.setText(note.isEmpty() ? item.getCategory().getName() : note);
+        DecimalFormat df = new DecimalFormat("0.00");
+        viewHolder.amountTxt.setText("$" + df.format(item.getAmount()));
+        //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.CANADA);
+        viewHolder.dateTxt.setText(DateUtils.formatDateTime(
+                mContext,
+                item.getDateMillis(),
+                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_YEAR
+        ));
+
+        viewHolder.paymentMethodTxt.setText(item.getPaymentMethod());
+        viewHolder.circle.setColorFilter(Color.parseColor(item.getCategory().getColour()));
+    }
+/*
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return layoutInflater.inflate(R.layout.li_history_item, parent, false);
@@ -56,11 +87,18 @@ public class HistoryAdapter extends CursorAdapter {
 
         String note = item.getNote();
         categoryTxt.setText(note.isEmpty() ? item.getCategory().getName() : note);
-        DecimalFormat df = new DecimalFormat("#.00");
+        DecimalFormat df = new DecimalFormat("0.00");
         amountTxt.setText("$" + df.format(item.getAmount()));
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.CANADA);
-        dateTxt.setText(sdf.format(item.getDateMillis()));
+        //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.CANADA);
+        dateTxt.setText(DateUtils.formatDateTime(
+                mContext,
+                item.getDateMillis(),
+                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_YEAR
+        ));
+
         paymentMethodTxt.setText(item.getPaymentMethod());
         circle.setColorFilter(Color.parseColor(item.getCategory().getColour()));
     }
+*/
+
 }

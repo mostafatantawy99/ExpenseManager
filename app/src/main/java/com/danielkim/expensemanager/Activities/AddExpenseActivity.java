@@ -2,6 +2,7 @@ package com.danielkim.expensemanager.Activities;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -21,10 +22,11 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.danielkim.expensemanager.CustomAnimation;
+import com.danielkim.expensemanager.Utils.CustomAnimation;
+import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
-import com.danielkim.expensemanager.Utilities;
+import com.danielkim.expensemanager.Utils.Utilities;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -63,7 +65,7 @@ public class AddExpenseActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_expense);
         db = new DBHelper(this);
-        calendar = calendar.getInstance();
+        calendar = Calendar.getInstance();
 
         fabDone = (FloatingActionButton)findViewById(R.id.fab_done);
         txtExpenseInput = (TextView)findViewById(R.id.txt_expense_total);
@@ -142,7 +144,7 @@ public class AddExpenseActivity extends AppCompatActivity
                 confirmAddExpense();
             }
         });
-
+        fabDone.hide();
         // populate spinners with database data
         populateSpinners();
     }
@@ -151,6 +153,7 @@ public class AddExpenseActivity extends AppCompatActivity
         CustomAnimation.expand(findViewById(R.id.add_expense_numpad));
         btnExpandNumPad.setText(R.string.okay);
         btnExpandNumPad.setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
+        fabDone.hide();
     }
 
     private void onNumPadCollapse(){
@@ -158,6 +161,7 @@ public class AddExpenseActivity extends AppCompatActivity
         Drawable img = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_expand_more_white_24dp);
         btnExpandNumPad.setText("");
         btnExpandNumPad.setCompoundDrawablesWithIntrinsicBounds(null, null, img, null);
+        fabDone.show();
     }
 
     public void onNumPadButtonClick(View v){
@@ -219,8 +223,17 @@ public class AddExpenseActivity extends AppCompatActivity
         long categoryId = category.getInt(category.getColumnIndex(DBHelper.CategoriesTable._ID));
         String paymentMethod = spinnerPaymentMethod.getSelectedItem().toString();
         // Store date as time since epoch
-        long date = calendar.getTimeInMillis() / 1000L;
-        db.insertNewExpense(date, amount, categoryId, paymentMethod, notes);
+        long date = calendar.getTimeInMillis();
+        //db.insertNewExpense(date, amount, categoryId, paymentMethod, notes);
+
+        ContentValues cv = new ContentValues();
+        cv.put(DBHelper.ExpensesTable.COL_AMOUNT, amount);
+        cv.put(DBHelper.ExpensesTable.COL_DATE, date);
+        cv.put(DBHelper.ExpensesTable.COL_CATEGORY_ID, categoryId);
+        cv.put(DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID, paymentMethod);
+        cv.put(DBHelper.ExpensesTable.COL_NOTES, notes);
+        getContentResolver().insert(DBContentProvider.CONTENT_URI, cv);
+
         onBackPressed(); // close activity
     }
 
@@ -229,18 +242,11 @@ public class AddExpenseActivity extends AppCompatActivity
         Cursor categoriesCursor = db.getCategories();
         Cursor pmCursor = db.getPaymentMethods();
 
-        //ArrayList<String> categories = new ArrayList<>();
         ArrayList<String> paymentMethods = new ArrayList<>();
 
-        /*
-        for (categoriesCursor.moveToFirst(); !categoriesCursor.isAfterLast(); categoriesCursor.moveToNext()){
-            categories.add(categoriesCursor.getString(categoriesCursor.getColumnIndex(DBHelper.CategoriesTable.COL_CATEGORY)));
-        }*/
         for (pmCursor.moveToFirst(); !pmCursor.isAfterLast(); pmCursor.moveToNext()){
             paymentMethods.add(pmCursor.getString(pmCursor.getColumnIndex(DBHelper.PaymentMethodsTable.COL_PAYMENT_METHOD)));
         }
-
-        //ArrayAdapter<String> adapterCategories = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, categories);
 
         SimpleCursorAdapter adapterCategories = new SimpleCursorAdapter
                 (this, android.R.layout.simple_dropdown_item_1line, categoriesCursor,
@@ -251,7 +257,6 @@ public class AddExpenseActivity extends AppCompatActivity
         ArrayAdapter<String> adapterPaymentMethods = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, paymentMethods);
         spinnerPaymentMethod.setAdapter(adapterPaymentMethods);
 
-        //categoriesCursor.close();
         pmCursor.close();
     }
 }

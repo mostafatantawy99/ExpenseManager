@@ -1,4 +1,4 @@
-package com.danielkim.expensemanager;
+package com.danielkim.expensemanager.Utils;
 
 import android.view.View;
 import android.view.animation.Animation;

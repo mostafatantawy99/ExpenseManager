@@ -1,4 +1,4 @@
-package com.danielkim.expensemanager;
+package com.danielkim.expensemanager.Models;
 
 import android.database.Cursor;
 import com.danielkim.expensemanager.Databases.DBHelper;

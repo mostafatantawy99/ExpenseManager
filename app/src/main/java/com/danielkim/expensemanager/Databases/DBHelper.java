@@ -6,8 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
-import com.danielkim.expensemanager.ExpenseCategory;
-import com.danielkim.expensemanager.ExpenseItem;
+import com.danielkim.expensemanager.Models.ExpenseCategory;
+import com.danielkim.expensemanager.Models.ExpenseItem;
 
 /**
  * Created by Daniel on 2/5/2016.

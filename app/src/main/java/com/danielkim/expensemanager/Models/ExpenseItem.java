@@ -1,4 +1,4 @@
-package com.danielkim.expensemanager;
+package com.danielkim.expensemanager.Models;
 
 import android.database.Cursor;
 import android.os.Parcel;
@@ -103,7 +103,7 @@ public class ExpenseItem{
         item.setCategory(category);
         item.setNote(c.getString(c.getColumnIndex(DBHelper.ExpensesTable.COL_NOTES)));
         item.setPaymentMethod(c.getString(c.getColumnIndex(DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID)));
-        item.setDateMillis(c.getInt(c.getColumnIndex(DBHelper.ExpensesTable.COL_DATE)));
+        item.setDateMillis(c.getLong(c.getColumnIndex(DBHelper.ExpensesTable.COL_DATE)));
         return item;
     }
 }
