@@ -38,7 +38,7 @@
                     android:id="@+id/txt_hist_category"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="#000000"
+                    android:textColor="@color/black"
                     android:textSize="15sp"
                     android:text="Category"
                 />
@@ -60,7 +60,7 @@
                         android:id="@+id/txt_hist_amount"
                         android:layout_width="match_parent"
                         android:textSize="15sp"
-                        android:textColor="#000000"
+                        android:textColor="@color/black"
                         android:text="$0.00"
                         android:gravity="right"
                         android:fontFamily="sans-serif-medium"

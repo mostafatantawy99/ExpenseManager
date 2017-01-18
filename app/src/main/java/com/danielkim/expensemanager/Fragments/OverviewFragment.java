@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.danielkim.expensemanager.Activities.AddExpenseActivity;
@@ -21,8 +22,10 @@ import com.danielkim.expensemanager.Adapters.OverviewAdapter;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
+import com.danielkim.expensemanager.Utils.Utilities;
 
 import java.text.DecimalFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -32,15 +35,18 @@ public class OverviewFragment extends Fragment implements LoaderManager.LoaderCa
     private TextView txtCurrentMonth = null;
     private FloatingActionButton fabAddExpense; // add new expense fab button
     private TextView txtCurrentMonthExpenses = null;
-    private LinearLayout overviewLayout = null;
+    private ScrollView overviewLayout = null;
     private OverviewAdapter adapter = null;
     private LoaderManager.LoaderCallbacks<Cursor> mCallbacks;
 
     private static final String[] PROJECTION =
             new String[]
                     {
-                        DBHelper.ExpensesTable.COL_AMOUNT
+                        DBHelper.ExpensesTable.COL_AMOUNT,
                     };
+
+    private static final String SELECTION = "strftime('" + Utilities.MONTH_YEAR_FORMAT_SQL + "', " + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch') = ?";
+    private String[] selectionArgs;
 
     private static final int LOADER_ID = 0;
 
@@ -50,6 +56,10 @@ public class OverviewFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Calendar cal = Calendar.getInstance();
+        int month = cal.get(Calendar.MONTH) + 1; // 0 indexed month
+        int year = cal.get(Calendar.YEAR);
+        selectionArgs = new String[] {String.format("%02d", month) + " " + year};
     }
 
     @Nullable
@@ -58,7 +68,7 @@ public class OverviewFragment extends Fragment implements LoaderManager.LoaderCa
         View v = inflater.inflate(R.layout.fragment_overview, container, false);
         txtCurrentMonth = (TextView)v.findViewById(R.id.overview_txt_current_month);
         txtCurrentMonthExpenses = (TextView)v.findViewById(R.id.overview_txt_current_month_expenses);
-        overviewLayout = (LinearLayout)v.findViewById(R.id.overviewBody);
+        overviewLayout = (ScrollView)v.findViewById(R.id.overviewBody);
 
         String monthName =(String)android.text.format.DateFormat.format("MMMM", new Date());
         txtCurrentMonth.setText(monthName);
@@ -83,7 +93,7 @@ public class OverviewFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this.getContext(), DBContentProvider.CONTENT_URI, PROJECTION, null, null, null);
+        return new CursorLoader(this.getContext(), DBContentProvider.CONTENT_URI, PROJECTION, SELECTION, selectionArgs, null);
     }
 
     @Override

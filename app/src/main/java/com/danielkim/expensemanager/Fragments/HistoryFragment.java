@@ -13,10 +13,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.*;
 
+import com.danielkim.expensemanager.Activities.MainActivity;
 import com.danielkim.expensemanager.Adapters.HistoryAdapter;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
+import com.danielkim.expensemanager.Utils.Utilities;
 
 /**
  * Created by Daniel on 4/21/2016.
@@ -38,15 +40,35 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
                         "t1." + DBHelper.ExpensesTable.COL_NOTES
                 };
     private static final String SORT_BY = "t1." + DBHelper.ExpensesTable.COL_DATE + " DESC";
+    private static final String SELECTION = "strftime('" + Utilities.MONTH_YEAR_FORMAT_SQL + "', t1." + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch') = ?";
+    private String[] selectionArgs;
+
     private LoaderManager.LoaderCallbacks<Cursor> mCallbacks;
 
+    private static final String ARGS_MONTH_YEAR = "monthYear";
+
     public HistoryFragment() {
+    }
+
+    public static HistoryFragment newInstance(String monthYear) {
+        Bundle args = new Bundle();
+        HistoryFragment fragment = new HistoryFragment();
+        args.putString(ARGS_MONTH_YEAR, monthYear);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        // set month year to display
+        Bundle args = getArguments();
+        String monthYear = args.getString(ARGS_MONTH_YEAR);
+        selectionArgs = new String[] {monthYear};
+        String title = Utilities.getFormattedMonthYear(monthYear);
+        ((MainActivity) getActivity()).setActionBarTitle(title);
     }
 
     @Nullable
@@ -71,6 +93,7 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_history, menu);
     }
@@ -82,7 +105,6 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
                 HistoryFilterFragment fragment = new HistoryFilterFragment();
                 this.getFragmentManager().beginTransaction()
                         .replace(R.id.container, fragment)
-                        .addToBackStack(null)
                         .commit();
                 return true;
             default:
@@ -92,7 +114,7 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this.getContext(), DBContentProvider.CONTENT_URI, PROJECTION, null, null, SORT_BY);
+        return new CursorLoader(this.getContext(), DBContentProvider.CONTENT_URI, PROJECTION, SELECTION, selectionArgs, SORT_BY);
     }
 
     @Override

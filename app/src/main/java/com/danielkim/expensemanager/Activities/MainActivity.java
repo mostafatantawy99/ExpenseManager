@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -19,6 +20,9 @@ import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Fragments.HistoryFragment;
 import com.danielkim.expensemanager.Fragments.OverviewFragment;
 import com.danielkim.expensemanager.R;
+import com.danielkim.expensemanager.Utils.Utilities;
+
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -44,6 +48,13 @@ public class MainActivity extends AppCompatActivity
         database = new DBHelper(this);
 
         displayView(R.id.nav_overview);
+
+        getSupportFragmentManager().addOnBackStackChangedListener(
+                new FragmentManager.OnBackStackChangedListener() {
+                    public void onBackStackChanged() {
+                        // Change NavBar titles
+                    }
+                });
     }
 
     @Override
@@ -87,17 +98,25 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    public void setActionBarTitle(String title){
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(title);
+        }
+    }
+
     public void displayView(int viewId){
         Fragment fragment = null;
         String title = getString(R.string.app_name);
         switch (viewId) {
             case R.id.nav_overview:
                 fragment = new OverviewFragment();
-                title  = "Overview";
+                title  = getResources().getString(R.string.nav_overview);
                 break;
             case R.id.nav_history:
-                fragment = new HistoryFragment();
-                title = "History";
+                Calendar cal = Calendar.getInstance();
+                int month = cal.get(Calendar.MONTH) + 1; // 0 indexed month
+                int year = cal.get(Calendar.YEAR);
+                fragment = HistoryFragment.newInstance(String.format("%02d", month) + " " + year);
                 break;
             case R.id.nav_charts:
             case R.id.nav_export:
@@ -110,13 +129,12 @@ public class MainActivity extends AppCompatActivity
             getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.container, fragment)
+                .addToBackStack(null)
                 .commit();
         }
 
         // set the toolbar title
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(title);
-        }
+        setActionBarTitle(title);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

@@ -12,7 +12,7 @@
     <string name="nav_charts">Charts</string>
     <string name="nav_export">Export</string>
 
-    <!-- Main Summary Page -->
+    <!-- Common -->
     <string name="currency">$</string>
 
     <!-- Add Expense Fragment-->
@@ -34,4 +34,8 @@
     <string name="num1">1</string>
     <string name="num0">0</string>
     <string name="dot">.</string>
+
+    <!-- History Filter -->
+    <string name="title_history_filter_action">Filter</string>
+    <string name="total_transactions">Total Transactions: %d</string>
 </resources>

@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.view.inputmethod.InputMethodManager;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -52,5 +54,20 @@ public final class Utilities {
             default: monthString = "Invalid month"; break;
         }
         return monthString;
+    }
+
+    public static final String MONTH_YEAR_FORMAT_SQL = "%m %Y";
+
+    // date should be in mm YYYY format
+    public static String getFormattedMonthYear(String date){
+        String month = convertMonthIntToLongName(Integer.parseInt(date.substring(0, 2)));
+        String year = date.substring(3);
+
+        return month + " " + year;
+    }
+
+    private static DecimalFormat twoDecimalPlaceFormat = new DecimalFormat("0.00");
+    public static String doubleTwoDecimalPlaces(double d){
+        return twoDecimalPlaceFormat.format(d);
     }
 }

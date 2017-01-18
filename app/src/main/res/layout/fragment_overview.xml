@@ -5,7 +5,6 @@
          xmlns:tools="http://schemas.android.com/tools"
          android:layout_width="match_parent"
          android:layout_height="match_parent"
-         android:fitsSystemWindows="true"
          tools:context=".Activities.MainActivity">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -61,12 +60,12 @@
                 android:textSize="30sp"
                 android:text="@string/currency" />
         </RelativeLayout>
-        <LinearLayout
+        <ScrollView
                 android:id="@+id/overviewBody"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-        </LinearLayout>
+                android:layout_height="wrap_content">
+        </ScrollView>
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton

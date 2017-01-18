@@ -12,6 +12,7 @@ import android.widget.*;
 
 import com.danielkim.expensemanager.Models.ExpenseItem;
 import com.danielkim.expensemanager.R;
+import com.danielkim.expensemanager.Utils.Utilities;
 
 import java.text.DecimalFormat;
 
@@ -20,7 +21,7 @@ import java.text.DecimalFormat;
  */
 
 public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.ViewHolder>{
-    private static Context mContext;
+    private Context mContext;
     private LayoutInflater layoutInflater;
 
     public HistoryAdapter(Context context, Cursor c) {
@@ -57,8 +58,7 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
         ExpenseItem item = ExpenseItem.fromCursor(cursor);
         String note = item.getNote();
         viewHolder.categoryTxt.setText(note.isEmpty() ? item.getCategory().getName() : note);
-        DecimalFormat df = new DecimalFormat("0.00");
-        viewHolder.amountTxt.setText("$" + df.format(item.getAmount()));
+        viewHolder.amountTxt.setText("$" + Utilities.doubleTwoDecimalPlaces(item.getAmount()));
         //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.CANADA);
         viewHolder.dateTxt.setText(DateUtils.formatDateTime(
                 mContext,
@@ -69,36 +69,4 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
         viewHolder.paymentMethodTxt.setText(item.getPaymentMethod());
         viewHolder.circle.setColorFilter(Color.parseColor(item.getCategory().getColour()));
     }
-/*
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return layoutInflater.inflate(R.layout.li_history_item, parent, false);
-    }
-
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        item = ExpenseItem.fromCursor(cursor);
-
-        categoryTxt = (TextView)view.findViewById(R.id.txt_hist_category);
-        amountTxt = (TextView)view.findViewById(R.id.txt_hist_amount);
-        dateTxt = (TextView)view.findViewById(R.id.txt_hist_date);
-        paymentMethodTxt = (TextView)view.findViewById(R.id.txt_hist_payment_method);
-        circle = (ImageView)view.findViewById(R.id.circle_hist);
-
-        String note = item.getNote();
-        categoryTxt.setText(note.isEmpty() ? item.getCategory().getName() : note);
-        DecimalFormat df = new DecimalFormat("0.00");
-        amountTxt.setText("$" + df.format(item.getAmount()));
-        //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.CANADA);
-        dateTxt.setText(DateUtils.formatDateTime(
-                mContext,
-                item.getDateMillis(),
-                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_YEAR
-        ));
-
-        paymentMethodTxt.setText(item.getPaymentMethod());
-        circle.setColorFilter(Color.parseColor(item.getCategory().getColour()));
-    }
-*/
-
 }
