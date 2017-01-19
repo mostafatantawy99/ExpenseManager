@@ -10,7 +10,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.*;
 
 import com.danielkim.expensemanager.Activities.MainActivity;
@@ -18,7 +17,7 @@ import com.danielkim.expensemanager.Adapters.HistoryAdapter;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
-import com.danielkim.expensemanager.Utils.Utilities;
+import com.danielkim.expensemanager.Utils.Utils;
 
 /**
  * Created by Daniel on 4/21/2016.
@@ -40,12 +39,12 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
                         "t1." + DBHelper.ExpensesTable.COL_NOTES
                 };
     private static final String SORT_BY = "t1." + DBHelper.ExpensesTable.COL_DATE + " DESC";
-    private static final String SELECTION = "strftime('" + Utilities.MONTH_YEAR_FORMAT_SQL + "', t1." + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch') = ?";
+    private static final String SELECTION = "strftime('" + Utils.MONTH_YEAR_FORMAT_SQL + "', t1." + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch') = ?";
     private String[] selectionArgs;
 
     private LoaderManager.LoaderCallbacks<Cursor> mCallbacks;
-
     private static final String ARGS_MONTH_YEAR = "monthYear";
+    private String monthYear;
 
     public HistoryFragment() {
     }
@@ -65,9 +64,19 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
 
         // set month year to display
         Bundle args = getArguments();
-        String monthYear = args.getString(ARGS_MONTH_YEAR);
+        monthYear = args.getString(ARGS_MONTH_YEAR);
         selectionArgs = new String[] {monthYear};
-        String title = Utilities.getFormattedMonthYear(monthYear);
+        setActionBarTitle();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setActionBarTitle();
+    }
+
+    private void setActionBarTitle(){
+        String title = Utils.getFormattedMonthYear(monthYear);
         ((MainActivity) getActivity()).setActionBarTitle(title);
     }
 
@@ -103,7 +112,8 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
         switch (item.getItemId()){
             case R.id.action_filter_history:
                 HistoryFilterFragment fragment = new HistoryFilterFragment();
-                this.getFragmentManager().beginTransaction()
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
                         .replace(R.id.container, fragment)
                         .commit();
                 return true;

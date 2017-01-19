@@ -7,13 +7,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import com.danielkim.expensemanager.Activities.MainActivity;
 import com.danielkim.expensemanager.Fragments.HistoryFilterFragment;
 import com.danielkim.expensemanager.Fragments.HistoryFragment;
 import com.danielkim.expensemanager.R;
-import com.danielkim.expensemanager.Utils.Utilities;
+import com.danielkim.expensemanager.Utils.Utils;
 
 /**
  * Created by Daniel on 11/7/2016.
@@ -54,8 +53,8 @@ public class HistoryFilterAdapter extends CursorRecyclerViewAdapter<HistoryFilte
     @Override
     public void onBindViewHolder(ViewHolder holder, Cursor c) {
         final String monthYear = c.getString(HistoryFilterFragment.PROJECTION_DATE);
-        String monthYearFormatted = Utilities.getFormattedMonthYear( c.getString(HistoryFilterFragment.PROJECTION_DATE));
-        String amount = Utilities.doubleTwoDecimalPlaces(c.getDouble(HistoryFilterFragment.PROJECTION_SUM)); // amount
+        String monthYearFormatted = Utils.getFormattedMonthYear( c.getString(HistoryFilterFragment.PROJECTION_DATE));
+        String amount = Utils.doubleTwoDecimalPlaces(c.getDouble(HistoryFilterFragment.PROJECTION_SUM)); // amount
         int count = c.getInt(HistoryFilterFragment.PROJECTION_COUNT);
 
         holder.mAmount.setText("$" + amount);

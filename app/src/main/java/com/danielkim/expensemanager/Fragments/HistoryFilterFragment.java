@@ -7,27 +7,18 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.util.Pair;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.danielkim.expensemanager.Activities.MainActivity;
-import com.danielkim.expensemanager.Adapters.HistoryAdapter;
 import com.danielkim.expensemanager.Adapters.HistoryFilterAdapter;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
-import com.danielkim.expensemanager.Models.ExpenseItem;
 import com.danielkim.expensemanager.R;
-import com.danielkim.expensemanager.Utils.Utilities;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import com.danielkim.expensemanager.Utils.Utils;
 
 /**
  * Created by Daniel on 11/7/2016.
@@ -46,7 +37,7 @@ public class HistoryFilterFragment extends Fragment implements LoaderManager.Loa
             new String[]
                     {
                             DBHelper.ExpensesTable._ID,
-                            "strftime('" + Utilities.MONTH_YEAR_FORMAT_SQL + "'," + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch')",
+                            "strftime('" + Utils.MONTH_YEAR_FORMAT_SQL + "'," + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch')",
                             "sum(" + DBHelper.ExpensesTable.COL_AMOUNT + ")",
                             "count(*)"
                     };
@@ -59,6 +50,16 @@ public class HistoryFilterFragment extends Fragment implements LoaderManager.Loa
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setActionBarTitle();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setActionBarTitle();
+    }
+
+    private void setActionBarTitle(){
         ((MainActivity) getActivity()).setActionBarTitle(getResources().getString(R.string.nav_history));
     }
 

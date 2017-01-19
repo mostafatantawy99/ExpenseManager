@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -13,16 +12,16 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.danielkim.expensemanager.Activities.AddExpenseActivity;
+import com.danielkim.expensemanager.Activities.MainActivity;
 import com.danielkim.expensemanager.Adapters.OverviewAdapter;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
-import com.danielkim.expensemanager.Utils.Utilities;
+import com.danielkim.expensemanager.Utils.Utils;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -45,7 +44,7 @@ public class OverviewFragment extends Fragment implements LoaderManager.LoaderCa
                         DBHelper.ExpensesTable.COL_AMOUNT,
                     };
 
-    private static final String SELECTION = "strftime('" + Utilities.MONTH_YEAR_FORMAT_SQL + "', " + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch') = ?";
+    private static final String SELECTION = "strftime('" + Utils.MONTH_YEAR_FORMAT_SQL + "', " + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch') = ?";
     private String[] selectionArgs;
 
     private static final int LOADER_ID = 0;
@@ -94,6 +93,12 @@ public class OverviewFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(this.getContext(), DBContentProvider.CONTENT_URI, PROJECTION, SELECTION, selectionArgs, null);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity)getActivity()).setActionBarTitle(getResources().getString(R.string.nav_overview));
     }
 
     @Override

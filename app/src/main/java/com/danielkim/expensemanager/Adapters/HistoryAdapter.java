@@ -12,9 +12,7 @@ import android.widget.*;
 
 import com.danielkim.expensemanager.Models.ExpenseItem;
 import com.danielkim.expensemanager.R;
-import com.danielkim.expensemanager.Utils.Utilities;
-
-import java.text.DecimalFormat;
+import com.danielkim.expensemanager.Utils.Utils;
 
 /**
  * Created by Daniel on 2/20/2016.
@@ -58,7 +56,7 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
         ExpenseItem item = ExpenseItem.fromCursor(cursor);
         String note = item.getNote();
         viewHolder.categoryTxt.setText(note.isEmpty() ? item.getCategory().getName() : note);
-        viewHolder.amountTxt.setText("$" + Utilities.doubleTwoDecimalPlaces(item.getAmount()));
+        viewHolder.amountTxt.setText("$" + Utils.doubleTwoDecimalPlaces(item.getAmount()));
         //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.CANADA);
         viewHolder.dateTxt.setText(DateUtils.formatDateTime(
                 mContext,

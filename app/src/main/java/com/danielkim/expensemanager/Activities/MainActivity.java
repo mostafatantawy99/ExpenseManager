@@ -1,12 +1,8 @@
 package com.danielkim.expensemanager.Activities;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -20,7 +16,6 @@ import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Fragments.HistoryFragment;
 import com.danielkim.expensemanager.Fragments.OverviewFragment;
 import com.danielkim.expensemanager.R;
-import com.danielkim.expensemanager.Utils.Utilities;
 
 import java.util.Calendar;
 
@@ -47,7 +42,12 @@ public class MainActivity extends AppCompatActivity
 
         database = new DBHelper(this);
 
-        displayView(R.id.nav_overview);
+        OverviewFragment fragment = new OverviewFragment();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, fragment)
+                .commit();
+        setActionBarTitle(getResources().getString(R.string.nav_overview));
 
         getSupportFragmentManager().addOnBackStackChangedListener(
                 new FragmentManager.OnBackStackChangedListener() {

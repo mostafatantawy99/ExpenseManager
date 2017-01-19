@@ -2,7 +2,7 @@ package com.danielkim.expensemanager.Models;
 
 import android.database.Cursor;
 import com.danielkim.expensemanager.Databases.DBHelper;
-import com.danielkim.expensemanager.Utils.Utilities;
+import com.danielkim.expensemanager.Utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,7 +32,7 @@ public class ExpenseItems {
     }
 
     public void addItem(Date d, ExpenseItem item){
-        Date date = Utilities.convertDateToNearestMonthYear(d);
+        Date date = Utils.convertDateToNearestMonthYear(d);
         List<ExpenseItem> prev = items.get(date);
 
         if (prev == null){
@@ -50,7 +50,7 @@ public class ExpenseItems {
     private void getItemsFromCursor(Cursor c){
         items.clear();
         for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()){
-            Date d = Utilities.convertDateToNearestMonthYear(new Date(c.getColumnIndex(DBHelper.ExpensesTable.COL_DATE)));
+            Date d = Utils.convertDateToNearestMonthYear(new Date(c.getColumnIndex(DBHelper.ExpensesTable.COL_DATE)));
             List<ExpenseItem> prev = items.get(d);
 
             ExpenseItem i = ExpenseItem.fromCursor(c);

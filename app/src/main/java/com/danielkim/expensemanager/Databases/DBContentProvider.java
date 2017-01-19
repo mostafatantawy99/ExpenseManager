@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
-import com.danielkim.expensemanager.Utils.Utilities;
+import com.danielkim.expensemanager.Utils.Utils;
 
 /**
  * Created by Daniel on 7/16/2016.
@@ -97,7 +97,7 @@ public class DBContentProvider extends ContentProvider {
                         + uri.getLastPathSegment());
                 break;
             case EXPENSES_FILTER:
-                groupBy = "strftime('" + Utilities.MONTH_YEAR_FORMAT_SQL + "'," + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch')";
+                groupBy = "strftime('" + Utils.MONTH_YEAR_FORMAT_SQL + "'," + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch')";
                 queryBuilder.setTables(DBHelper.ExpensesTable.TABLE_EXPENSES_NAME);
                 break;
             default:

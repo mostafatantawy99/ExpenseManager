@@ -13,8 +13,8 @@ import java.util.GregorianCalendar;
 /**
  * Created by Daniel on 2/16/2016.
  */
-public final class Utilities {
-    private Utilities() {
+public final class Utils {
+    private Utils() {
     }
 
     // close soft keyboard
